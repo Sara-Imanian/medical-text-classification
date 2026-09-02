@@ -76,7 +76,7 @@ POST /predict
 
 ```json
 {
-    "package": "Eye"
+    "category": "Eye"
 }
 ```
 
