@@ -1,7 +1,3 @@
-# ============================================
-# 1. Import Libraries
-# ============================================
-
 from tensorflow import keras
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
@@ -13,53 +9,43 @@ import pandas as pd
 import numpy as np
 import re
 
-
 # ============================================
-# 2. Load Dataset
+# Load Dataset
 # ============================================
 
 keras.utils.set_random_seed(42)
 
-df = pd.read_csv("medical_tourism_dataset.csv")
+df = pd.read_csv("medical_comments_dataset.csv")
 
 # print(df.head())
 # print(df.shape)
 # print(df.info())
 
-
 # ============================================
-# 3. Data Cleaning
+# Data Cleaning
 # ============================================
 
-# Remove missing values
 df = df.dropna()
-
-# Remove duplicate rows
 df = df.drop_duplicates()
 
 # print(df.isnull().sum())
 # print(df.shape)
 
-
 # ============================================
-# 4. Text Preprocessing
+# Text Preprocessing
 # ============================================
 
-# Convert to lowercase
 df["message"] = df["message"].str.lower()
 
-# Remove extra spaces
 df["message"] = df["message"].str.strip()
 df["message"] = df["message"].str.replace(r"\s+", " ", regex=True)
 
-# Remove punctuation
 df["message"] = df["message"].apply(
     lambda x: re.sub(r"[^\w\s]", "", x)
 )
 
-
 # ============================================
-# 5. Separate Features and Labels
+# Separate Features and Labels
 # ============================================
 
 X = df["message"]
@@ -68,51 +54,41 @@ y = df["package"]
 # print(X.head())
 # print(y.head())
 
-
 # ============================================
-# 6. Label Encoding
+# Label Encoding
 # ============================================
 
 encoder = LabelEncoder()
 y = encoder.fit_transform(y)
-
 # print(encoder.classes_)
 
-
 # ============================================
-# 7. Tokenization
+# Tokenization
 # ============================================
 
 tokenizer = Tokenizer(oov_token="<OOV>")
-
 tokenizer.fit_on_texts(X)
-
 # print(tokenizer.word_index)
 
-
 # ============================================
-# 8. Convert Text to Sequences
+# Convert Text to Sequences
 # ============================================
 
 X = tokenizer.texts_to_sequences(X)
-
 # print(X[:5])
 
-
 # ============================================
-# 9. Padding
+# Padding
 # ============================================
 
 X = pad_sequences(
     X,
     padding="post"
 )
-
 # print(X.shape)
 
-
 # ============================================
-# 10. Train / Test Split
+# Train / Test Split
 # ============================================
 
 X_train, X_test, y_train, y_test = train_test_split(
@@ -121,13 +97,12 @@ X_train, X_test, y_train, y_test = train_test_split(
     test_size=0.20,
     random_state=42
 )
-
 # print(X_train.shape)
 # print(X_test.shape)
 
 
 # ============================================
-# 11. Build Neural Network
+# Build Neural Network
 # ============================================
 
 model = keras.Sequential([
@@ -139,25 +114,17 @@ model = keras.Sequential([
 
     keras.layers.GlobalAveragePooling1D(),
 
-    keras.layers.Dense(
-        16,
-        activation="relu"
-    ),
+    keras.layers.Dense( 16, activation="relu"),
 
-    keras.layers.Dense(
-        len(encoder.classes_),
-        activation="softmax"
-    )
-
+    keras.layers.Dense( len(encoder.classes_), activation="softmax")
 ])
 
 model.build(input_shape=(None, X.shape[1]))
 
 # model.summary()
 
-
 # ============================================
-# 12. Compile Model
+# Compile Model
 # ============================================
 
 model.compile(
@@ -166,9 +133,8 @@ model.compile(
     metrics=["accuracy"]
 )
 
-
 # ============================================
-# 13. Train Model
+# Train Model
 # ============================================
 
 history = model.fit(
@@ -178,9 +144,8 @@ history = model.fit(
     validation_data=(X_test, y_test)
 )
 
-
 # ============================================
-# 14. Save Model & Objects
+# Save Model & Objects
 # ============================================
 
 import joblib
